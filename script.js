@@ -114,54 +114,61 @@ setInterval(tick, 1000);
   const label = document.getElementById("musicLabel");
   if (!audio || !control) return;
 
-  audio.volume = 0.45;
-  let playing = false;
-  let fileMissing = false;
+  audio.volume = 0.5;
 
-  // If the mp3 isn't there, say so clearly instead of failing silently.
-  audio.addEventListener("error", () => {
-    fileMissing = true;
+  function setLabel(t) { if (label) label.textContent = t; }
+
+  // Let the actual audio events drive the UI — no manual flags to get out of sync.
+  audio.addEventListener("playing", () => {
+    control.classList.add("playing");
+    setLabel("Pause");
+    if (icon) icon.innerHTML = "&#9835;";
+  });
+  audio.addEventListener("pause", () => {
     control.classList.remove("playing");
-    label.textContent = "Add music/indigo.mp3";
+    setLabel("Play our song");
+  });
+  audio.addEventListener("error", () => {
+    control.classList.remove("playing");
+    setLabel("Song file not found");
   });
 
-  function play() {
-    if (fileMissing) {
-      label.textContent = "Add music/indigo.mp3";
-      return;
+  function tryPlay() {
+    const p = audio.play();
+    if (p && typeof p.catch === "function") {
+      p.catch(() => {
+        // If the file genuinely failed to load, say so. Otherwise it was just
+        // auto-play being blocked, and the first tap will start it.
+        if (audio.error || audio.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
+          setLabel("Song file not found");
+        }
+      });
     }
-    audio.play().then(() => {
-      playing = true;
-      control.classList.add("playing");
-      label.textContent = "Pause";
-      icon.innerHTML = "&#9835;";
-    }).catch(() => {
-      // Either autoplay was blocked (will retry on tap) or the file is missing.
-      if (fileMissing || audio.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
-        label.textContent = "Add music/indigo.mp3";
-      }
-    });
-  }
-  function pause() {
-    audio.pause();
-    playing = false;
-    control.classList.remove("playing");
-    label.textContent = "Play our song";
   }
 
-  control.addEventListener("click", () => (playing ? pause() : play()));
+  // The button is the explicit play/pause toggle.
+  control.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (audio.paused) tryPlay();
+    else audio.pause();
+  });
 
-  // Browsers block auto-play until the user interacts, so start the song on
-  // the very first tap/click/keypress anywhere on the page.
-  function firstInteraction() {
-    if (!playing) play();
-    window.removeEventListener("pointerdown", firstInteraction);
-    window.removeEventListener("keydown", firstInteraction);
+  // Browsers block auto-play until the first user gesture, so start the song on
+  // the first tap/click/keypress ANYWHERE (but ignore taps on the button, which
+  // handles itself — this is what was previously starting then instantly pausing).
+  function firstGesture(e) {
+    if (control.contains(e.target)) return;
+    tryPlay();
+    document.removeEventListener("pointerdown", firstGesture);
+    document.removeEventListener("keydown", firstGesture);
+    document.removeEventListener("touchstart", firstGesture);
   }
-  window.addEventListener("pointerdown", firstInteraction);
-  window.addEventListener("keydown", firstInteraction);
-  // optimistic immediate attempt (works if the browser allows auto-play)
-  play();
+  document.addEventListener("pointerdown", firstGesture);
+  document.addEventListener("keydown", firstGesture);
+  document.addEventListener("touchstart", firstGesture);
+
+  // optimistic immediate attempt (works only if the browser allows auto-play)
+  tryPlay();
 })();
 
 /* ===== Realistic dahlia flowers (layered SVG petals) ===== */
