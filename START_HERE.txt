@@ -31,4 +31,11 @@ Want to change anything?
 • The photo captions are in script.js (PHOTOS).
 • Your message to her is in index.html (the "hero-message" part).
 
+────────────────────────────────────────────────────
+Dalhia can add her own photos too!
+────────────────────────────────────────────────────
+There's an "Add your own" section on the page where she can tap to choose
+pictures (or drag them in). Those photos save right in her phone/browser, so
+they stay there next time she opens the site. (They live on her device only.)
+
 made with love 💕
