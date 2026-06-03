@@ -97,6 +97,12 @@ body {
   padding: 2rem;
   position: relative;
 }
+.hero-tag {
+  font-family: 'Dancing Script', cursive;
+  font-size: clamp(1.3rem, 4vw, 2rem);
+  color: var(--blush);
+  margin-bottom: -.4rem;
+}
 .hero-title {
   font-family: 'Dancing Script', cursive;
   font-size: clamp(3.5rem, 14vw, 8rem);
@@ -104,10 +110,18 @@ body {
   text-shadow: 0 3px 30px rgba(255, 79, 139, .8);
   line-height: 1;
 }
-.hero-sub {
-  font-size: clamp(1rem, 3vw, 1.4rem);
-  color: var(--blush);
-  margin-top: .5rem;
+.hero-message {
+  max-width: 34rem;
+  margin: 1.4rem auto 0;
+  font-size: clamp(1rem, 2.6vw, 1.25rem);
+  line-height: 1.7;
+  color: var(--cream);
+}
+.hero-message p { margin-bottom: .6rem; }
+.hero-signature {
+  font-style: italic;
+  color: var(--gold);
+  margin-top: 1rem;
 }
 .hero-song {
   margin-top: 1.4rem;
@@ -190,6 +204,14 @@ section {
 .gallery img {
   width: 100%;
   display: block;
+}
+.gallery figcaption {
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.4rem;
+  color: var(--rose-deep, #7b1437);
+  background: rgba(255, 245, 248, .92);
+  padding: .5rem .6rem .7rem;
+  text-align: center;
 }
 /* graceful placeholder when a photo file isn't there yet */
 .gallery .placeholder {

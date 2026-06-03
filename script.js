@@ -4,22 +4,33 @@
    2) PHOTOS      -> the list of your picture file names
    ========================================================= */
 
-// When you became "us". Format: YYYY, MM(0-11!), DD, HH, MM
-// NOTE: months are 0-indexed in JS, so 6 = July.
-// This is set so the counter reads ~10 months 25 days. Tweak to your exact moment.
-const START_DATE = new Date(2025, 6, 9, 6, 15, 0); // July 9, 2025, 6:15 AM
+// The exact moment you two became "us" (from your old site).
+// July 9, 2025, 07:01:53 UTC -> reads about 10 months 25 days right now.
+const START_DATE = new Date("2025-07-09T07:01:53Z");
 
-// Add your photos to the images/ folder and list the file names here.
+// Photos + captions (the captions spell out a message in order).
+// Upload these same files into the images/ folder. Filenames are
+// case-sensitive on the web, so keep .JPG vs .jpg exactly as below.
 // Missing files automatically show a pretty placeholder, so it never looks broken.
 const PHOTOS = [
-  { src: "images/photo1.jpg", caption: "us ❤" },
-  { src: "images/photo2.jpg", caption: "cold but cozy" },
-  { src: "images/photo3.jpg", caption: "all of us" },
-  { src: "images/photo4.jpg", caption: "late nights" },
-  { src: "images/photo5.jpg", caption: "+ a goat 🐐" },
-  { src: "images/photo6.jpg", caption: "more of you" },
-  { src: "images/photo7.jpg", caption: "favorite day" },
-  { src: "images/photo8.jpg", caption: "you & me" },
+  { src: "images/IMG_9375.JPG", caption: "I love" },
+  { src: "images/IMG_9376.jpg", caption: "you" },
+  { src: "images/IMG_9377.jpg", caption: "Dalhia" },
+  { src: "images/IMG_9378.JPG", caption: "you make" },
+  { src: "images/IMG_9379.JPG", caption: "my world" },
+  { src: "images/IMG_9380.JPG", caption: "light up" },
+  { src: "images/IMG_9383.JPG", caption: "like" },
+  { src: "images/IMG_9467.jpg", caption: "never before" },
+  { src: "images/IMG_9468.jpg", caption: "you are" },
+  { src: "images/IMG_9474.jpg", caption: "my" },
+  { src: "images/IMG_9507.JPG", caption: "everything" },
+  { src: "images/IMG_9548.JPG", caption: "always" },
+  { src: "images/IMG_9577.JPG", caption: "and forever" },
+  { src: "images/IMG_9583.JPG", caption: "i want" },
+  { src: "images/IMG_9614.JPG", caption: "you in" },
+  { src: "images/IMG_9615.JPG", caption: "my life" },
+  { src: "images/IMG_9616.JPG", caption: "i loveee" },
+  { src: "images/IMG_9617.JPG", caption: "youuu daliiii" },
 ];
 
 /* ===== Live "together for" counter ===== */
@@ -81,11 +92,16 @@ setInterval(tick, 1000);
       ph.innerHTML =
         '<span class="ph-flower">🌺</span>' +
         "<span>add <b>" +
-        photo.src +
+        photo.src.replace("images/", "") +
         "</b><br>to the images folder</span>";
       fig.replaceChild(ph, img);
     };
     fig.appendChild(img);
+    if (photo.caption) {
+      const cap = document.createElement("figcaption");
+      cap.textContent = photo.caption;
+      fig.appendChild(cap);
+    }
     gallery.appendChild(fig);
   });
 })();

@@ -1,0 +1,34 @@
+💖 FOR DALHIA — how to put this site online 💖
+
+You only have to do 3 little things, then drag-and-drop like last time.
+
+────────────────────────────────────────────────────
+STEP 1 — Add the photos
+────────────────────────────────────────────────────
+Open your OLD site folder, go into its "images" folder, and copy ALL the
+pictures into the "images" folder inside THIS folder.
+(They already have the right names — IMG_9375.JPG, etc. — so they'll just work.)
+
+────────────────────────────────────────────────────
+STEP 2 — Add the song
+────────────────────────────────────────────────────
+Put an mp3 of "Indigo" by Sam Barber into the "music" folder, and name it
+exactly:   indigo.mp3
+(The music starts on the first tap — phones block auto-play, that's normal.)
+
+────────────────────────────────────────────────────
+STEP 3 — Put it online
+────────────────────────────────────────────────────
+Go to  https://app.netlify.com/drop
+and DRAG this whole folder onto the page. Done! 🎉
+(Or, on your existing site in Netlify: Deploys tab → drag the folder to redeploy.)
+
+────────────────────────────────────────────────────
+Want to change anything?
+────────────────────────────────────────────────────
+• The exact date you got together is in script.js (START_DATE) — already set to
+  July 9, 2025 so the counter reads ~10 months 25 days.
+• The photo captions are in script.js (PHOTOS).
+• Your message to her is in index.html (the "hero-message" part).
+
+made with love 💕
