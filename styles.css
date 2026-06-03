@@ -1,0 +1,287 @@
+/* ===== Base ===== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --rose: #c2185b;
+  --rose-deep: #7b1437;
+  --blush: #ffd1e3;
+  --plum: #4a154b;
+  --cream: #fff5f8;
+  --gold: #e8b4c8;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Quicksand', system-ui, sans-serif;
+  color: var(--cream);
+  background:
+    radial-gradient(circle at 20% 10%, #5a1140 0%, transparent 45%),
+    radial-gradient(circle at 80% 30%, #3a1140 0%, transparent 45%),
+    linear-gradient(160deg, #2a0a25 0%, #4a154b 50%, #7b1437 100%);
+  background-attachment: fixed;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+.section-title {
+  font-family: 'Dancing Script', cursive;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  color: var(--blush);
+  text-align: center;
+  text-shadow: 0 2px 18px rgba(194, 24, 91, 0.6);
+  margin-bottom: 1rem;
+}
+
+/* ===== Dahlia flower (pure CSS) ===== */
+.dahlia {
+  --size: 120px;
+  --c1: #ff4f8b;
+  --c2: #c2185b;
+  --c3: #7b1437;
+  width: var(--size);
+  height: var(--size);
+  position: relative;
+  filter: drop-shadow(0 6px 14px rgba(0,0,0,.35));
+}
+.dahlia::before,
+.dahlia::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, #ffe08a 0 8%, transparent 9%),
+    conic-gradient(from 0deg,
+      var(--c1) 0 11.25%, var(--c2) 11.25% 22.5%,
+      var(--c1) 22.5% 33.75%, var(--c2) 33.75% 45%,
+      var(--c1) 45% 56.25%, var(--c2) 56.25% 67.5%,
+      var(--c1) 67.5% 78.75%, var(--c2) 78.75% 90%,
+      var(--c1) 90% 100%);
+  -webkit-mask: radial-gradient(circle at 50% 50%,
+      #000 0 6%, transparent 7% 14%, #000 15% 50%, transparent 52%);
+          mask: radial-gradient(circle at 50% 50%,
+      #000 0 6%, transparent 7% 14%, #000 15% 50%, transparent 52%);
+}
+/* inner ring of petals, rotated + darker for depth */
+.dahlia::after {
+  transform: rotate(22.5deg) scale(.62);
+  --c1: #ff6fa0;
+  background:
+    radial-gradient(circle at 50% 50%, #ffe08a 0 14%, transparent 15%),
+    conic-gradient(from 0deg,
+      var(--c3) 0 11.25%, var(--c2) 11.25% 22.5%,
+      var(--c3) 22.5% 33.75%, var(--c2) 33.75% 45%,
+      var(--c3) 45% 56.25%, var(--c2) 56.25% 67.5%,
+      var(--c3) 67.5% 78.75%, var(--c2) 78.75% 90%,
+      var(--c3) 90% 100%);
+}
+.dahlia--big { --size: 170px; margin: 0 auto 1.2rem; animation: spin 40s linear infinite; }
+.dahlia--small { --size: 70px; margin: 0 auto 1rem; }
+.dahlia--corner { --size: 110px; position: absolute; opacity: .85; }
+.dahlia--tl { top: -30px; left: -20px; }
+.dahlia--tr { top: -30px; right: -20px; }
+.dahlia--bl { bottom: -30px; left: -20px; }
+.dahlia--br { bottom: -30px; right: -20px; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ===== Hero ===== */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  position: relative;
+}
+.hero-title {
+  font-family: 'Dancing Script', cursive;
+  font-size: clamp(3.5rem, 14vw, 8rem);
+  color: #fff;
+  text-shadow: 0 3px 30px rgba(255, 79, 139, .8);
+  line-height: 1;
+}
+.hero-sub {
+  font-size: clamp(1rem, 3vw, 1.4rem);
+  color: var(--blush);
+  margin-top: .5rem;
+}
+.hero-song {
+  margin-top: 1.4rem;
+  font-size: .95rem;
+  color: var(--gold);
+  letter-spacing: .5px;
+}
+.scroll-hint {
+  position: absolute;
+  bottom: 2rem;
+  font-size: .85rem;
+  color: var(--blush);
+  opacity: .8;
+  animation: bob 1.8s ease-in-out infinite;
+}
+@keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(8px); } }
+
+/* ===== Sections ===== */
+section {
+  padding: clamp(3rem, 8vw, 6rem) 1.2rem;
+  position: relative;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ===== Counter ===== */
+.counter-section { text-align: center; }
+.counter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .8rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+.count-box {
+  background: rgba(255, 255, 255, .08);
+  border: 1px solid rgba(255, 209, 227, .35);
+  border-radius: 18px;
+  padding: 1rem 1.1rem;
+  min-width: 92px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.25);
+}
+.count-box .num {
+  display: block;
+  font-size: clamp(1.8rem, 6vw, 2.8rem);
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 2px 12px rgba(255,79,139,.6);
+}
+.count-box .unit {
+  font-size: .8rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--blush);
+}
+.counter-foot { margin-top: 1.5rem; font-size: 1.1rem; color: var(--gold); }
+
+/* ===== Gallery ===== */
+.gallery-section { text-align: center; }
+.gallery-note { color: var(--gold); margin-bottom: 2rem; font-style: italic; }
+.gallery {
+  columns: 3 240px;
+  column-gap: 1rem;
+}
+.gallery figure {
+  break-inside: avoid;
+  margin: 0 0 1rem;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 3px solid rgba(255, 209, 227, .5);
+  box-shadow: 0 10px 30px rgba(0,0,0,.35);
+  transition: transform .3s ease, box-shadow .3s ease;
+  background: rgba(255,255,255,.05);
+}
+.gallery figure:hover {
+  transform: translateY(-6px) rotate(-1deg);
+  box-shadow: 0 16px 40px rgba(194,24,91,.5);
+}
+.gallery img {
+  width: 100%;
+  display: block;
+}
+/* graceful placeholder when a photo file isn't there yet */
+.gallery .placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  flex-direction: column;
+  gap: .6rem;
+  color: var(--blush);
+  background: linear-gradient(135deg, rgba(255,79,139,.25), rgba(74,21,75,.4));
+  font-size: .9rem;
+  padding: 1rem;
+  text-align: center;
+}
+.gallery .placeholder .ph-flower { font-size: 2.4rem; }
+
+/* ===== Letter ===== */
+.letter-section { text-align: center; }
+.letter {
+  max-width: 620px;
+  margin: 0 auto;
+  background: rgba(255, 245, 248, .1);
+  border: 1px solid rgba(255, 209, 227, .35);
+  border-radius: 22px;
+  padding: clamp(1.6rem, 5vw, 2.6rem);
+  backdrop-filter: blur(6px);
+  text-align: left;
+  box-shadow: 0 12px 36px rgba(0,0,0,.3);
+}
+.letter p { margin-bottom: 1rem; font-size: 1.08rem; }
+.letter .signoff {
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.8rem;
+  color: var(--blush);
+  text-align: right;
+  margin-top: 1.4rem;
+}
+
+/* ===== Footer ===== */
+.footer { text-align: center; padding: 3rem 1rem 4rem; color: var(--gold); }
+
+/* ===== Music control ===== */
+.music-control {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  background: rgba(194, 24, 91, .85);
+  color: #fff;
+  padding: .6rem .9rem;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: .85rem;
+  font-weight: 600;
+  box-shadow: 0 6px 18px rgba(0,0,0,.35);
+  user-select: none;
+  transition: transform .2s ease, background .2s ease;
+}
+.music-control:hover { transform: scale(1.05); background: var(--rose); }
+.music-control.playing .music-icon { animation: pulse 1s ease-in-out infinite; }
+.music-icon { font-size: 1.2rem; }
+@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+
+/* ===== Falling petals ===== */
+.petals {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+.petal {
+  position: absolute;
+  top: -40px;
+  width: 14px;
+  height: 14px;
+  background: radial-gradient(circle at 30% 30%, #ff8ab3, #c2185b);
+  border-radius: 150% 0 150% 0;
+  opacity: .8;
+  animation: fall linear infinite;
+}
+@keyframes fall {
+  0%   { transform: translateY(-40px) rotate(0deg);   opacity: 0; }
+  10%  { opacity: .85; }
+  100% { transform: translateY(105vh) rotate(540deg);  opacity: .2; }
+}
+
+@media (max-width: 520px) {
+  .music-label { display: none; }
+  .gallery { columns: 2 150px; }
+}
