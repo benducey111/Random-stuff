@@ -1,8 +1,18 @@
 /* =========================================================
-   EDIT THESE TWO THINGS:
+   EDIT THESE THINGS:
    1) START_DATE  -> the exact day & time you two got together
    2) PHOTOS      -> the list of your picture file names
+   3) SUPABASE_*  -> paste your two Supabase keys to turn on the
+                     SHARED collage (everyone can add, everyone sees).
+                     See SUPABASE_SETUP.txt for the 2-minute setup.
    ========================================================= */
+
+// ===== Shared photo album (Supabase) =====
+// Find these in your Supabase project: Settings -> API.
+// Until you paste them, uploads still work but save only on each person's device.
+const SUPABASE_URL = "https://YOURPROJECT.supabase.co";
+const SUPABASE_ANON_KEY = "YOUR_ANON_KEY";
+const SUPABASE_BUCKET = "photos";
 
 // The exact moment you two became "us" (from your old site).
 // July 9, 2025, 07:01:53 UTC -> reads about 10 months 25 days right now.
@@ -215,61 +225,58 @@ setInterval(tick, 1000);
 })();
 
 /* ===== Let Dalhia upload her own photos (saved in her browser) ===== */
-(function uploads() {
-  const KEY = "dalhia_photos_v1";
+(function sharedCollage() {
   const input = document.getElementById("fileInput");
   const zone = document.getElementById("dropzone");
-  const grid = document.getElementById("userGallery");
+  const grid = document.getElementById("gallery"); // upload straight into the main collage
   const hint = document.getElementById("uploadHint");
   if (!input || !grid) return;
 
-  let photos = [];
-  try { photos = JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) { photos = []; }
+  const useSupabase =
+    typeof supabase !== "undefined" &&
+    SUPABASE_URL && SUPABASE_URL.indexOf("YOURPROJECT") === -1 &&
+    SUPABASE_ANON_KEY && SUPABASE_ANON_KEY.indexOf("YOUR_ANON") === -1;
 
-  function save() {
-    try {
-      localStorage.setItem(KEY, JSON.stringify(photos));
-      return true;
-    } catch (e) {
-      hint.textContent = "Your phone's storage for this page is full — remove a photo to add more.";
-      return false;
-    }
+  // remove only the shared/uploaded cards, leaving the base photos in place
+  function clearShared() {
+    grid.querySelectorAll(".shared").forEach((el) => el.remove());
   }
 
-  function render() {
-    grid.innerHTML = "";
-    photos.forEach((src, i) => {
-      const fig = document.createElement("figure");
-      fig.className = "user-photo";
-      const img = document.createElement("img");
-      img.src = src;
-      img.alt = "";
+  function makeCard(src, onDelete) {
+    const fig = document.createElement("figure");
+    fig.className = "shared";
+    const img = document.createElement("img");
+    img.src = src;
+    img.alt = "";
+    img.loading = "lazy";
+    fig.appendChild(img);
+    if (onDelete) {
       const btn = document.createElement("button");
       btn.className = "del-btn";
       btn.innerHTML = "&times;";
       btn.title = "remove";
-      btn.addEventListener("click", () => { photos.splice(i, 1); save(); render(); });
-      fig.appendChild(img);
+      btn.addEventListener("click", onDelete);
       fig.appendChild(btn);
-      grid.appendChild(fig);
-    });
+    }
+    grid.appendChild(fig);
   }
 
-  // Shrink big photos before saving so they fit in browser storage.
-  function shrink(file) {
+  // shrink a File to JPEG — Blob for Supabase, dataURL for on-device fallback
+  function shrink(file, asBlob) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => {
         const img = new Image();
         img.onload = () => {
-          const max = 1100;
+          const max = asBlob ? 1400 : 1100;
           let w = img.width, h = img.height;
           if (w > h && w > max) { h = (h * max) / w; w = max; }
           else if (h > max) { w = (w * max) / h; h = max; }
           const c = document.createElement("canvas");
           c.width = w; c.height = h;
           c.getContext("2d").drawImage(img, 0, 0, w, h);
-          resolve(c.toDataURL("image/jpeg", 0.82));
+          if (asBlob) c.toBlob((b) => (b ? resolve(b) : reject(new Error("blob"))), "image/jpeg", 0.85);
+          else resolve(c.toDataURL("image/jpeg", 0.82));
         };
         img.onerror = reject;
         img.src = reader.result;
@@ -279,27 +286,87 @@ setInterval(tick, 1000);
     });
   }
 
+  function wireInputs(addFn) {
+    input.addEventListener("change", (e) => { addFn(e.target.files); input.value = ""; });
+    zone.addEventListener("dragover", (e) => { e.preventDefault(); zone.classList.add("drag"); });
+    zone.addEventListener("dragleave", () => zone.classList.remove("drag"));
+    zone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      zone.classList.remove("drag");
+      if (e.dataTransfer && e.dataTransfer.files) addFn(e.dataTransfer.files);
+    });
+  }
+
+  const SHARED_HINT = "anyone can add a picture — and everyone sees them 💕";
+
+  /* ===== Mode A: shared album via Supabase (everyone sees it) ===== */
+  if (useSupabase) {
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const B = SUPABASE_BUCKET;
+    hint.textContent = SHARED_HINT;
+
+    async function load() {
+      const { data, error } = await sb.storage.from(B).list("", {
+        limit: 1000, sortBy: { column: "created_at", order: "asc" },
+      });
+      if (error) { hint.textContent = "Couldn't load shared photos: " + error.message; return; }
+      clearShared();
+      (data || [])
+        .filter((f) => f.name && f.name !== ".emptyFolderPlaceholder")
+        .forEach((f) => {
+          const url = sb.storage.from(B).getPublicUrl(f.name).data.publicUrl;
+          makeCard(url, async () => {
+            if (!confirm("Remove this photo for everyone?")) return;
+            await sb.storage.from(B).remove([f.name]);
+            load();
+          });
+        });
+    }
+
+    async function add(files) {
+      for (const file of files) {
+        if (!file.type || !file.type.startsWith("image/")) continue;
+        hint.textContent = "uploading…";
+        try {
+          const blob = await shrink(file, true);
+          const name = Date.now() + "-" + Math.random().toString(36).slice(2, 8) + ".jpg";
+          const { error } = await sb.storage.from(B).upload(name, blob, { contentType: "image/jpeg" });
+          if (error) { hint.textContent = "Upload failed: " + error.message; }
+        } catch (e) { /* skip unreadable files */ }
+      }
+      hint.textContent = SHARED_HINT;
+      load();
+    }
+
+    wireInputs(add);
+    load();
+    setInterval(load, 10000); // photos others add show up within ~10s
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) load(); });
+    return;
+  }
+
+  /* ===== Mode B: fallback — saved on this device only ===== */
+  hint.textContent = "saved on this device for now — add your Supabase keys to share with everyone (see SUPABASE_SETUP.txt)";
+  const KEY = "dalhia_photos_v1";
+  let photos = [];
+  try { photos = JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) { photos = []; }
+
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(photos)); return true; }
+    catch (e) { hint.textContent = "This device's storage is full — remove a photo to add more."; return false; }
+  }
+  function render() {
+    clearShared();
+    photos.forEach((src, i) => makeCard(src, () => { photos.splice(i, 1); save(); render(); }));
+  }
   async function add(files) {
     for (const f of files) {
       if (!f.type || !f.type.startsWith("image/")) continue;
-      try {
-        const data = await shrink(f);
-        photos.push(data);
-        if (!save()) break;
-      } catch (e) { /* skip unreadable files */ }
+      try { const data = await shrink(f, false); photos.push(data); if (!save()) break; } catch (e) {}
     }
     render();
   }
-
-  input.addEventListener("change", (e) => { add(e.target.files); input.value = ""; });
-  zone.addEventListener("dragover", (e) => { e.preventDefault(); zone.classList.add("drag"); });
-  zone.addEventListener("dragleave", () => zone.classList.remove("drag"));
-  zone.addEventListener("drop", (e) => {
-    e.preventDefault();
-    zone.classList.remove("drag");
-    if (e.dataTransfer && e.dataTransfer.files) add(e.dataTransfer.files);
-  });
-
+  wireInputs(add);
   render();
 })();
 

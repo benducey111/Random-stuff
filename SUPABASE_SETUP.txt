@@ -1,0 +1,74 @@
+💕 SHARED PHOTO COLLAGE — Supabase setup (about 2-3 minutes) 💕
+
+This makes it so ANYONE who opens the site can add a picture, and EVERYONE
+sees it in the main collage.
+
+You only do this once. You'll copy 2 values into script.js at the end.
+
+────────────────────────────────────────────────────
+STEP 1 — Make a project (skip if you already have one)
+────────────────────────────────────────────────────
+1. Go to  https://supabase.com  and sign in.
+2. Click "New project". Give it any name (e.g. "dalhia"). Pick a password
+   (save it somewhere) and a region near you. Click "Create new project".
+3. Wait ~1 minute for it to finish setting up.
+
+────────────────────────────────────────────────────
+STEP 2 — Make a public photo bucket
+────────────────────────────────────────────────────
+1. In the left sidebar click "Storage".
+2. Click "New bucket".
+3. Name it exactly:   photos
+4. Turn ON "Public bucket".   (important!)
+5. Click "Save" / "Create bucket".
+
+────────────────────────────────────────────────────
+STEP 3 — Allow anyone to add & remove photos
+────────────────────────────────────────────────────
+1. In the left sidebar click "SQL Editor".
+2. Click "New query", paste EVERYTHING below, then click "Run":
+
+    create policy "anyone can view photos"
+      on storage.objects for select
+      using ( bucket_id = 'photos' );
+
+    create policy "anyone can add photos"
+      on storage.objects for insert
+      with check ( bucket_id = 'photos' );
+
+    create policy "anyone can remove photos"
+      on storage.objects for delete
+      using ( bucket_id = 'photos' );
+
+   You should see "Success. No rows returned." That's correct.
+
+────────────────────────────────────────────────────
+STEP 4 — Copy your 2 keys into the site
+────────────────────────────────────────────────────
+1. In the sidebar click the gear "Project Settings" -> "API".
+2. Find:
+     • Project URL          (looks like  https://abcdwxyz.supabase.co )
+     • Project API keys -> "anon" "public"   (a long string)
+3. Open script.js (in your Dalhia-site folder) and edit the top:
+
+     const SUPABASE_URL = "https://abcdwxyz.supabase.co";   <- your Project URL
+     const SUPABASE_ANON_KEY = "paste-the-anon-public-key-here";
+
+   Keep the quotes. Save the file.
+
+────────────────────────────────────────────────────
+STEP 5 — Use it
+────────────────────────────────────────────────────
+Open the site (or re-upload the folder to Netlify). Tap "add a photo to the
+collage", pick pictures — they upload and appear for EVERYONE within a few
+seconds. 🎉
+
+Don't want to edit the file yourself? Just send Ben/Claude these two values
+and we'll paste them in for you:
+   • Project URL
+   • anon public key
+(The anon key is safe to share — it's meant to live in the website.)
+
+Note: with these settings anyone who has your site link can add or remove
+photos. That's perfect for a private link shared with friends/family. If you
+ever want only logged-in people to post, that's a bigger change — just ask.

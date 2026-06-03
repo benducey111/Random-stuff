@@ -220,7 +220,7 @@ section {
 .dz-text { font-size: 1rem; line-height: 1.4; }
 .dz-text small { opacity: .8; }
 .upload-hint { text-align: center; color: var(--gold); font-size: .85rem; margin-bottom: 2rem; }
-.user-photo { position: relative; }
+.gallery figure.shared { position: relative; }
 .del-btn {
   position: absolute;
   top: 8px;

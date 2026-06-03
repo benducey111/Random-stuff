@@ -32,10 +32,14 @@ Want to change anything?
 • Your message to her is in index.html (the "hero-message" part).
 
 ────────────────────────────────────────────────────
-Dalhia can add her own photos too!
+SHARED collage — everyone can add photos!
 ────────────────────────────────────────────────────
-There's an "Add your own" section on the page where she can tap to choose
-pictures (or drag them in). Those photos save right in her phone/browser, so
-they stay there next time she opens the site. (They live on her device only.)
+Right above the collage there's an "add a photo to the collage" button. Anyone
+who opens the site can add pictures, and they drop straight into the main
+collage for EVERYONE to see.
+
+To turn the sharing on, do the quick one-time setup in SUPABASE_SETUP.txt
+(about 2-3 minutes) and paste your 2 keys into script.js. Until you do that,
+uploads still work but only save on each person's own device.
 
 made with love 💕
