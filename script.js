@@ -13,24 +13,24 @@ const START_DATE = new Date("2025-07-09T07:01:53Z");
 // case-sensitive on the web, so keep .JPG vs .jpg exactly as below.
 // Missing files automatically show a pretty placeholder, so it never looks broken.
 const PHOTOS = [
-  { src: "images/IMG_9375.JPG", caption: "I love" },
-  { src: "images/IMG_9376.jpg", caption: "you" },
-  { src: "images/IMG_9377.jpg", caption: "Dalhia" },
-  { src: "images/IMG_9378.JPG", caption: "you make" },
-  { src: "images/IMG_9379.JPG", caption: "my world" },
-  { src: "images/IMG_9380.JPG", caption: "light up" },
-  { src: "images/IMG_9383.JPG", caption: "like" },
-  { src: "images/IMG_9467.jpg", caption: "never before" },
-  { src: "images/IMG_9468.jpg", caption: "you are" },
-  { src: "images/IMG_9474.jpg", caption: "my" },
-  { src: "images/IMG_9507.JPG", caption: "everything" },
-  { src: "images/IMG_9548.JPG", caption: "always" },
-  { src: "images/IMG_9577.JPG", caption: "and forever" },
-  { src: "images/IMG_9583.JPG", caption: "i want" },
-  { src: "images/IMG_9614.JPG", caption: "you in" },
-  { src: "images/IMG_9615.JPG", caption: "my life" },
-  { src: "images/IMG_9616.JPG", caption: "i loveee" },
-  { src: "images/IMG_9617.JPG", caption: "youuu daliiii" },
+  { src: "images/IMG_9375.JPG", caption: "you're beautiful" },
+  { src: "images/IMG_9376.jpg", caption: "i love you" },
+  { src: "images/IMG_9377.jpg", caption: "my favorite person" },
+  { src: "images/IMG_9378.JPG", caption: "my whole heart" },
+  { src: "images/IMG_9379.JPG", caption: "you light up my world" },
+  { src: "images/IMG_9380.JPG", caption: "prettiest girl alive" },
+  { src: "images/IMG_9383.JPG", caption: "my best friend" },
+  { src: "images/IMG_9467.jpg", caption: "you make me smile" },
+  { src: "images/IMG_9468.jpg", caption: "my happy place" },
+  { src: "images/IMG_9474.jpg", caption: "mine forever 💕" },
+  { src: "images/IMG_9507.JPG", caption: "my everything" },
+  { src: "images/IMG_9548.JPG", caption: "always & forever" },
+  { src: "images/IMG_9577.JPG", caption: "my sweetheart" },
+  { src: "images/IMG_9583.JPG", caption: "i adore you" },
+  { src: "images/IMG_9614.JPG", caption: "you & me" },
+  { src: "images/IMG_9615.JPG", caption: "cutest girl ever" },
+  { src: "images/IMG_9616.JPG", caption: "my world" },
+  { src: "images/IMG_9617.JPG", caption: "i loveee youu dalhia" },
 ];
 
 /* ===== Live "together for" counter ===== */
@@ -116,15 +116,30 @@ setInterval(tick, 1000);
 
   audio.volume = 0.45;
   let playing = false;
+  let fileMissing = false;
+
+  // If the mp3 isn't there, say so clearly instead of failing silently.
+  audio.addEventListener("error", () => {
+    fileMissing = true;
+    control.classList.remove("playing");
+    label.textContent = "Add music/indigo.mp3";
+  });
 
   function play() {
+    if (fileMissing) {
+      label.textContent = "Add music/indigo.mp3";
+      return;
+    }
     audio.play().then(() => {
       playing = true;
       control.classList.add("playing");
       label.textContent = "Pause";
       icon.innerHTML = "&#9835;";
     }).catch(() => {
-      label.textContent = "Add music/indigo.mp3";
+      // Either autoplay was blocked (will retry on tap) or the file is missing.
+      if (fileMissing || audio.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
+        label.textContent = "Add music/indigo.mp3";
+      }
     });
   }
   function pause() {
@@ -136,8 +151,8 @@ setInterval(tick, 1000);
 
   control.addEventListener("click", () => (playing ? pause() : play()));
 
-  // Try to autoplay; most browsers block it until the first interaction,
-  // so we also start on the first click/tap/scroll anywhere.
+  // Browsers block auto-play until the user interacts, so start the song on
+  // the very first tap/click/keypress anywhere on the page.
   function firstInteraction() {
     if (!playing) play();
     window.removeEventListener("pointerdown", firstInteraction);
@@ -145,7 +160,7 @@ setInterval(tick, 1000);
   }
   window.addEventListener("pointerdown", firstInteraction);
   window.addEventListener("keydown", firstInteraction);
-  // attempt immediate (works if browser allows)
+  // optimistic immediate attempt (works if the browser allows auto-play)
   play();
 })();
 
